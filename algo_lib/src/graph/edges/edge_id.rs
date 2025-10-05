@@ -32,10 +32,8 @@ impl EdgeId for NoId {
     }
 
     fn id(&self) -> usize {
-        panic!("NoId has no id");
+        panic!("Id called on no id")
     }
 
-    fn set_id(&mut self, _id: usize) {
-        panic!("NoId has no id");
-    }
+    fn set_id(&mut self, _: usize) {}
 }

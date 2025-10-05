@@ -8,7 +8,7 @@ impl Solution {
             return 0;
         }
         let mut graph: HashMap<i32, Vec<i32>> = HashMap::new();
-        let mut res = 0;
+        let res = 0;
 
         for (bus, routes) in routes.iter().enumerate() {
             for route in routes.iter() {

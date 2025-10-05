@@ -1,5 +1,5 @@
 use crate::graph::edges::edge_id::NoId;
-use crate::graph::edges::{edge_id::EdgeId, edge_trait::EdgeTrait, edge_id::WithId};
+use crate::graph::edges::{edge_id::EdgeId, edge_id::WithId, edge_trait::EdgeTrait};
 
 #[derive(Clone)]
 pub struct EdgeRaw<Id: EdgeId, P> {
@@ -70,5 +70,4 @@ impl<Id: EdgeId, P: Clone> EdgeTrait for EdgeRaw<Id, P> {
 }
 
 pub type Edge<P> = EdgeRaw<NoId, P>;
-
 pub type EdgeWithId<P> = EdgeRaw<WithId, P>;

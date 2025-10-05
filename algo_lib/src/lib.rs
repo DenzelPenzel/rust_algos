@@ -1,7 +1,6 @@
 /// Algorithm library
-/// 
+///
 /// This library contains various algorithm implementations
-
 pub mod collections;
 pub mod graph;
 pub mod helpers;

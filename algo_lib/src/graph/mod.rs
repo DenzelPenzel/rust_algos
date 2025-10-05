@@ -1,9 +1,12 @@
-use crate::graph::edges::edge_trait::{BidirectionalEdgeTrait, EdgeTrait};
-use std::ops::{Index, IndexMut};
 use crate::graph::edges::edge::Edge;
+use crate::graph::edges::edge_trait::{BidirectionalEdgeTrait, EdgeTrait};
+use crate::collections::dsu::DSU;
+use std::ops::{Index, IndexMut};
 
 pub mod edges;
 pub mod topological_sort;
+mod scc;
+mod minimal_spanning_tree;
 
 pub struct Graph<E: EdgeTrait> {
     edges: Vec<Vec<E>>,
@@ -97,7 +100,6 @@ impl<E: EdgeTrait> IndexMut<usize> for Graph<E> {
     }
 }
 
-
 impl Graph<Edge<()>> {
     pub fn with_edges(n: usize, edges: &[(usize, usize)]) -> Self {
         let mut graph = Self::new(n);
@@ -108,7 +110,7 @@ impl Graph<Edge<()>> {
     }
 }
 
-impl <P: Clone> Graph<Edge<P>> {
+impl<P: Clone> Graph<Edge<P>> {
     pub fn with_edges_with_payload(n: usize, edges: &[(usize, usize, P)]) -> Self {
         let mut graph = Self::new(n);
         for (from, to, p) in edges.iter() {
