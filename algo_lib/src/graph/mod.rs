@@ -7,6 +7,7 @@ pub mod edges;
 pub mod topological_sort;
 mod scc;
 mod minimal_spanning_tree;
+mod dfs_order;
 
 pub struct Graph<E: EdgeTrait> {
     edges: Vec<Vec<E>>,
