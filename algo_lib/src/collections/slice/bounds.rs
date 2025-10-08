@@ -13,7 +13,8 @@ pub trait Bounds<T: PartialOrd> {
         self.upper_bound(el)
     }
     fn inside<'a>(&self, bounds: impl RangeBounds<&'a T>) -> usize
-    where T: 'a;
+    where
+        T: 'a;
 }
 
 // implement bounds trait for any slice
@@ -73,7 +74,7 @@ impl<T: PartialOrd> Bounds<T> for [T] {
 
     fn inside<'a>(&self, bounds: impl RangeBounds<&'a T>) -> usize
     where
-        T: 'a
+        T: 'a,
     {
         let to = match bounds.end_bound() {
             Bound::Included(el) => self.less_or_eq(el),

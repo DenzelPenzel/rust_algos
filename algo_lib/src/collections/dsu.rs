@@ -1,20 +1,20 @@
-use std::cell::Cell;
 use crate::collections::slice::bounds::Bounds;
 use crate::collections::slice::indices::Indices;
+use std::cell::Cell;
 
 #[derive(Clone)]
 pub struct DSU {
     // if id[i] is negative, i is a root and -id[i] is the size of the set
     // if id[i] is positive, id[i] is the parent of i
     id: Vec<Cell<i32>>,
-    count: usize
+    count: usize,
 }
 
 impl DSU {
     pub fn new(n: usize) -> Self {
         DSU {
             id: vec![Cell::new(-1); n],
-            count: n
+            count: n,
         }
     }
 
@@ -40,14 +40,11 @@ impl DSU {
         }
     }
 
-    pub fn iter(&self) -> impl Iterator<Item=usize> + '_ {
-        self.id.iter().enumerate().filter_map(|(i, c)| {
-            if c.get() < 0 {
-                Some(i)
-            } else {
-                None
-            }
-        })
+    pub fn iter(&self) -> impl Iterator<Item = usize> + '_ {
+        self.id
+            .iter()
+            .enumerate()
+            .filter_map(|(i, c)| if c.get() < 0 { Some(i) } else { None })
     }
 
     pub fn set_count(&self) -> usize {

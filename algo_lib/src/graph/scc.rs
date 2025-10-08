@@ -1,19 +1,19 @@
-use std::collections::HashSet;
+use crate::graph::Graph;
 use crate::graph::edges::edge::Edge;
 use crate::graph::edges::edge_trait::EdgeTrait;
-use crate::graph::Graph;
 use crate::helpers::recursive_function::{Callable, RecursiveFunction};
+use std::collections::HashSet;
 
 pub struct SCC {
     pub color: Vec<usize>,
-    pub edges: Graph<Edge<()>>
+    pub edges: Graph<Edge<()>>,
 }
 
 pub trait SCCTrait {
     fn scc(&self) -> SCC;
 }
 
-impl <E: EdgeTrait> SCCTrait for Graph<E> {
+impl<E: EdgeTrait> SCCTrait for Graph<E> {
     fn scc(&self) -> SCC {
         assert!(!E::REVERSABLE);
         let n = self.vertex_count();
@@ -41,7 +41,7 @@ impl <E: EdgeTrait> SCCTrait for Graph<E> {
         visited = HashSet::new();
         let mut index = 0usize;
         let mut graph = Graph::new(n);
-        let mut next = vec![n;n];
+        let mut next = vec![n; n];
         let mut queue = Vec::with_capacity(n);
 
         for v in 0..n {
@@ -80,10 +80,7 @@ impl <E: EdgeTrait> SCCTrait for Graph<E> {
             }
         }
 
-        SCC {
-            color,
-            edges: res,
-        }
+        SCC { color, edges: res }
     }
 }
 
@@ -94,7 +91,7 @@ mod tests {
     #[test]
     fn test_scc() {
         let mut graph = Graph::new(8);
-        graph.add_edge(Edge::new(0,1));
+        graph.add_edge(Edge::new(0, 1));
         graph.add_edge(Edge::new(1, 2));
         graph.add_edge(Edge::new(2, 0));
 

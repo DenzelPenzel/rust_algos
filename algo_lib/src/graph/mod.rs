@@ -1,12 +1,13 @@
+use crate::collections::dsu::DSU;
 use crate::graph::edges::edge::Edge;
 use crate::graph::edges::edge_trait::{BidirectionalEdgeTrait, EdgeTrait};
-use crate::collections::dsu::DSU;
 use std::ops::{Index, IndexMut};
 
+mod dfs_order;
 pub mod edges;
-pub mod topological_sort;
-mod scc;
 mod minimal_spanning_tree;
+mod scc;
+pub mod topological_sort;
 
 pub struct Graph<E: EdgeTrait> {
     edges: Vec<Vec<E>>,

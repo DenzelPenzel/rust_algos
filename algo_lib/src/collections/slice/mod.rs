@@ -1,2 +1,2 @@
-pub mod indices;
 pub mod bounds;
+pub mod indices;
