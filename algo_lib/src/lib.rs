@@ -4,6 +4,7 @@
 pub mod collections;
 pub mod graph;
 pub mod helpers;
+pub mod io;
 pub mod numbers;
 mod problems;
 
