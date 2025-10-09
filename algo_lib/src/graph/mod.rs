@@ -7,6 +7,7 @@ mod bridges;
 mod dfs_order;
 pub mod edges;
 mod euler_path;
+mod lca;
 mod minimal_spanning_tree;
 mod scc;
 pub mod topological_sort;
