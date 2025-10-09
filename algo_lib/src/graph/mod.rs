@@ -3,8 +3,10 @@ use crate::graph::edges::edge::Edge;
 use crate::graph::edges::edge_trait::{BidirectionalEdgeTrait, EdgeTrait};
 use std::ops::{Index, IndexMut};
 
+mod bridges;
 mod dfs_order;
 pub mod edges;
+mod euler_path;
 mod minimal_spanning_tree;
 mod scc;
 pub mod topological_sort;
