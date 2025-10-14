@@ -6,7 +6,7 @@ pub mod graph;
 pub mod helpers;
 pub mod io;
 pub mod numbers;
-mod problems;
+pub mod string;
 
 /// Adds two numbers
 pub fn add(a: i32, b: i32) -> i32 {

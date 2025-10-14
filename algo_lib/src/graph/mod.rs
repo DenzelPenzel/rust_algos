@@ -11,6 +11,7 @@ mod lca;
 mod minimal_spanning_tree;
 mod scc;
 pub mod topological_sort;
+mod max_flow;
 
 pub struct Graph<E: EdgeTrait> {
     edges: Vec<Vec<E>>,
