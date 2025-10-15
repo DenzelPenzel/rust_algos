@@ -49,7 +49,7 @@ impl Solution {
             Some(root) => {
                 let l = root.borrow().left.clone();
                 let r = root.borrow().right.clone();
-                return 1 + max(Self::max_depth(l), Self::max_depth(r));
+                1 + max(Self::max_depth(l), Self::max_depth(r))
             }
         }
     }

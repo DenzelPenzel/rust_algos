@@ -1,5 +1,5 @@
 [workspace]
-members = ["algo_lib", "tester"]
+members = ["algo_lib"]
 
 [package]
 name = "rust_algos"
