@@ -42,6 +42,11 @@ cargo test
 cargo test --package algo_lib
 ```
 
+### Run submission
+```bash
+cargo equip --bin rust_algos --remove docs --remove comments > sol.rs
+```
+
 ## Adding New Algorithms
 
 Add new functions to `algo_lib/src/lib.rs`:

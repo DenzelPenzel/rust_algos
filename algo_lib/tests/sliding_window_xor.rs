@@ -1,9 +1,8 @@
 /*
-https://cses.fi/problemset/task/3220
+https://cses.fi/problemset/task/3426
 
 You are given an array of n integers.
-Your task is to calculate the sum of each window of k elements, from left to right.
-
+Your task is to calculate the bitwise xor of each window of k elements, from left to right.
 In this problem the input data is large and it is created using a generator.
 
 Input
@@ -12,10 +11,10 @@ Input
 
 The input is generated as follows:
     x_1=x
-    x_i=(ax_{i-1}+b) \bmod c for i=2,3,\dots,n
+    x_i=(ax_{i-1}+b) mod c for i=2,3,...,n
 
 Output
-    Print the xor of all window sums.
+    Print the xor of all window xors.
 
 Constraints
     1 \le k \le n \le 10^7
@@ -24,17 +23,16 @@ Constraints
 
 Example
     Input:
-    8 5
-    3 7 1 11
+        8 5
+        3 7 1 11
 
-Output:
-    12
+    Output:
+        0
 
-Explanation:
-    The input array is [3,0,1,8,2,4,7,6].
-    The windows are [3,0,1,8,2], [0,1,8,2,4], [1,8,2,4,7] and [8,2,4,7,6],
-    and their sums are 14, 15, 22 and 27.
-    Thus, the answer is 14 \oplus 15 \oplus 22 \oplus 27 = 12.
+Explanation: The input array is [3,0,1,8,2,4,7,6].
+The windows are [3,0,1,8,2], [0,1,8,2,4], [1,8,2,4,7] and [8,2,4,7,6],
+and their xors are 8, 15, 8 and 15.
+Thus, the answer is 8 ^ 15 ^ 8 ^ 15 = 0.
 */
 
 use algo_lib::collections::sliding_window::SlidingWindow;
@@ -50,7 +48,7 @@ fn solve(input: &mut Input, output: &mut Output) {
     let c = input.read_long();
 
     let mut res = 0;
-    let mut sw = SlidingWindow::new(k, |a, b| a + b);
+    let mut sw = SlidingWindow::new(k, |a, b| a ^ b);
     for _ in 0..k - 1 {
         sw.push(x);
         x = (a * x + b) % c;
@@ -61,6 +59,14 @@ fn solve(input: &mut Input, output: &mut Output) {
         res ^= sw.get();
         x = (a * x + b) % c;
     }
+
+    /*
+    let res = iter::successors(Some(x), |xx| Some((a * xx + b) % c))
+        .take(n)
+        .enumerate()
+        .filter(|(i, _)| (i + 1).min(n - i).min(k) % 2 == 1)
+        .fold(0, |xor, (_, v)| xor ^ v);
+     */
 
     output.print_line(res);
 }
@@ -81,5 +87,5 @@ fn do_test(raw_input: &str, expected: &str) {
 
 #[test]
 fn run_test() {
-    do_test("8 5 3 7 1 11", "12");
+    do_test("8 5 3 7 1 11", "0");
 }
