@@ -7,7 +7,7 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
-algo_lib = { path = "algo_lib" }
+algo_lib = { path = "algo_lib", default-features = false, features = ["sliding_window", "string", "helpers"] }
 
 [profile.release]
 # Optimize for small binary size

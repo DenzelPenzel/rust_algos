@@ -4,3 +4,17 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
+
+[features]
+default = ["collections"]
+collections = ["arr", "bounds", "dsu", "fenwick", "min_max", "segment_tree", "slice", "sliding_window"]
+arr = []
+bounds = []
+dsu = []
+fenwick = []
+min_max = []
+segment_tree = []
+slice = []
+sliding_window = []
+string = []
+helpers = []
