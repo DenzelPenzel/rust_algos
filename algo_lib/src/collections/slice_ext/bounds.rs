@@ -17,7 +17,7 @@ pub trait Bounds<T: PartialOrd> {
         T: 'a;
 }
 
-// implement bounds trait for any slice
+// implement bounds trait for any slice_ext
 impl<T: PartialOrd> Bounds<T> for [T] {
     fn lower_bound(&self, el: &T) -> usize {
         let mut left = 0;

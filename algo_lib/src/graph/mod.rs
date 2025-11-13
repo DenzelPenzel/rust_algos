@@ -3,15 +3,17 @@ use crate::graph::edges::edge::Edge;
 use crate::graph::edges::edge_trait::{BidirectionalEdgeTrait, EdgeTrait};
 use std::ops::{Index, IndexMut};
 
-mod bridges;
-mod dfs_order;
+pub mod bridges;
+pub mod dfs_order;
 pub mod edges;
-mod euler_path;
-mod lca;
-mod minimal_spanning_tree;
-mod scc;
+pub mod euler_path;
+pub mod fast_max_flow;
+pub mod flow_graph;
+pub mod lca;
+pub mod max_flow;
+pub mod minimal_spanning_tree;
+pub mod scc;
 pub mod topological_sort;
-mod max_flow;
 
 pub struct Graph<E: EdgeTrait> {
     edges: Vec<Vec<E>>,

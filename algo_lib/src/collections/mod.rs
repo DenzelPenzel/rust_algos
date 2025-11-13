@@ -10,7 +10,13 @@ pub mod fenwick;
 pub mod min_max;
 #[cfg(feature = "segment_tree")]
 pub mod segment_tree;
-#[cfg(feature = "slice")]
-pub mod slice;
+#[cfg(feature = "slice_ext")]
+pub mod slice_ext;
 #[cfg(feature = "sliding_window")]
 pub mod sliding_window;
+#[cfg(feature = "payload")]
+pub mod payload;
+#[cfg(feature = "vec_ext")]
+pub mod vec_ext;
+#[cfg(feature = "link_cut")]
+pub mod link_cut;

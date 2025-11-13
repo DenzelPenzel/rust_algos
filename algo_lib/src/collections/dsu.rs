@@ -1,5 +1,5 @@
-use crate::collections::slice::bounds::Bounds;
-use crate::collections::slice::indices::Indices;
+use crate::collections::slice_ext::bounds::Bounds;
+use crate::collections::slice_ext::indices::Indices;
 use std::cell::Cell;
 
 #[derive(Clone)]
