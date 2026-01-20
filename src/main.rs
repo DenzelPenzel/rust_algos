@@ -1,6 +1,6 @@
+use algo_lib::collections::sliding_window::SlidingWindow;
 use algo_lib::io::input::Input;
 use algo_lib::io::output::Output;
-use algo_lib::collections::sliding_window::SlidingWindow;
 
 fn main() {
     let mut input = Input::stdin();

@@ -1,12 +1,12 @@
 /*
-You are given a 2D integer array towers, 
-where towers[i] = [xi, yi, qi] represents the 
+You are given a 2D integer array towers,
+where towers[i] = [xi, yi, qi] represents the
 coordinates (xi, yi) and quality factor qi of the ith tower.
 
-You are also given an integer array center = [cx, cy​​​​​​​] 
+You are also given an integer array center = [cx, cy​​​​​​​]
 representing your location, and an integer radius.
 
-A tower is reachable if its Manhattan distance 
+A tower is reachable if its Manhattan distance
 from center is less than or equal to radius.
 
 Among all reachable towers:
@@ -51,7 +51,6 @@ Constraints:
     0 <= xi, yi, qi, cx, cy <= 105​​​​​​​
     0 <= radius <= 105
 */
-
 
 struct Solution;
 

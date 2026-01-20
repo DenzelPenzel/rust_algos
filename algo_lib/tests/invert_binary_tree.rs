@@ -20,6 +20,6 @@ impl Solution {
                 node.borrow_mut().right = left;
                 Some(node)
             }
-        }   
+        }
     }
 }

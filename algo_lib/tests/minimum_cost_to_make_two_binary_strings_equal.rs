@@ -4,7 +4,7 @@ You are given two binary strings s and t, both of length n, and three positive i
 You are allowed to apply the following operations any number of times (in any order) to the strings s and t:
 
 Choose any index i and flip s[i] or t[i] (change '0' to '1' or '1' to '0'). The cost of this operation is flipCost.
-Choose two distinct indices i and j, and swap either s[i] and s[j] or t[i] and t[j]. 
+Choose two distinct indices i and j, and swap either s[i] and s[j] or t[i] and t[j].
 The cost of this operation is swapCost.
 
 Choose an index i and swap s[i] with t[i]. The cost of this operation is crossCost.
@@ -44,7 +44,13 @@ Constraints:
 struct Solution;
 
 impl Solution {
-    pub fn minimum_cost(s: String, t: String, flip_cost: i32, swap_cost: i32, cross_cost: i32) -> i64 {
+    pub fn minimum_cost(
+        s: String,
+        t: String,
+        flip_cost: i32,
+        swap_cost: i32,
+        cross_cost: i32,
+    ) -> i64 {
         let s_bytes = s.as_bytes();
         let t_bytes = t.as_bytes();
 
@@ -73,13 +79,13 @@ impl Solution {
         count_b -= d;
 
         let c: i64 = count_a / 2;
-    
+
         res += c as i64 * std::cmp::min(fc * 2, sc + cc);
 
         if count_a % 2 > 0 {
             res += fc;
         }
-        
+
         let f = count_b / 2;
 
         res += f as i64 * std::cmp::min(fc * 2, sc + cc);
@@ -93,5 +99,8 @@ impl Solution {
 
 #[test]
 fn run_test() {
-    assert_eq!(Solution::minimum_cost("01000".to_string(), "10111".to_string(), 10, 2, 2), 16);
+    assert_eq!(
+        Solution::minimum_cost("01000".to_string(), "10111".to_string(), 10, 2, 2),
+        16
+    );
 }

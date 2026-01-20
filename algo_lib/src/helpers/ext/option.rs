@@ -8,7 +8,11 @@ pub trait OptionExt: Sized {
     }
 
     fn take_if(self, val: bool) -> Option<Self> {
-        if val { Some(self) } else { None }
+        if val {
+            Some(self)
+        } else {
+            None
+        }
     }
 }
 

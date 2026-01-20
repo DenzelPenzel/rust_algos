@@ -1,5 +1,5 @@
-use crate::graph::Graph;
 use crate::graph::edges::edge_trait::BidirectionalEdgeTrait;
+use crate::graph::Graph;
 use std::ops::Range;
 
 pub trait DFSOrderTrait {

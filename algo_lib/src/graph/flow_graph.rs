@@ -7,7 +7,7 @@ pub trait FlowGraph<C: AdditionMonoidWithSub + PartialOrd + Copy, E: FlowEdgeTra
 }
 
 impl<C: AdditionMonoidWithSub + PartialOrd + Copy, E: FlowEdgeTrait<C>> FlowGraph<C, E>
-for Graph<E>
+    for Graph<E>
 {
     fn push_flow(&mut self, (to, reverse_id, flow): (usize, usize, C)) {
         *self.edges[to][reverse_id].capacity_mut() += flow;

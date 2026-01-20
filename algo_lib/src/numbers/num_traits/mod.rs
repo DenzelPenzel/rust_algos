@@ -1,2 +1,2 @@
-pub mod bit_ops;
 pub mod algebra;
+pub mod bit_ops;

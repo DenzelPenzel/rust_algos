@@ -41,7 +41,6 @@ Constraints:
     All words[i] are distinct.
 */
 
-
 struct Solution;
 
 impl Solution {
@@ -52,13 +51,13 @@ impl Solution {
 
         let k = 4;
         Self::permute(0, k, &mut refs, &mut res);
-        
+
         res.sort();
-        res 
+        res
     }
 
     fn permute(i: usize, k: usize, items: &mut Vec<&String>, res: &mut Vec<Vec<String>>) {
-       if i == k {
+        if i == k {
             let cand = &items[0..k];
             let t = cand[0].as_bytes();
             let l = cand[1].as_bytes();
@@ -70,19 +69,22 @@ impl Solution {
             }
 
             return;
-       }
+        }
 
-       for ii in i..items.len() {
-        items.swap(i, ii);
-        Self::permute(i + 1, k, items, res);
-        items.swap(i, ii);
-       }
+        for ii in i..items.len() {
+            items.swap(i, ii);
+            Self::permute(i + 1, k, items, res);
+            items.swap(i, ii);
+        }
     }
 }
 
 #[test]
 fn test() {
-    let words = vec!["able", "area", "echo", "also"].iter().map(|s| s.to_string()).collect();
+    let words = vec!["able", "area", "echo", "also"]
+        .iter()
+        .map(|s| s.to_string())
+        .collect();
     let res = Solution::word_squares(words);
     println!("{:?}", res);
 }

@@ -125,7 +125,11 @@ impl Input {
             }
             res.push(c);
         }
-        if res.is_empty() { None } else { Some(res) }
+        if res.is_empty() {
+            None
+        } else {
+            Some(res)
+        }
     }
 
     //noinspection RsSelfConvention

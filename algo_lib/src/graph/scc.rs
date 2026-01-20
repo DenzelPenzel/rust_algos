@@ -1,6 +1,6 @@
-use crate::graph::Graph;
 use crate::graph::edges::edge::Edge;
 use crate::graph::edges::edge_trait::EdgeTrait;
+use crate::graph::Graph;
 use crate::helpers::recursive_function::{Callable, RecursiveFunction};
 use std::collections::HashSet;
 

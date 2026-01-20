@@ -255,7 +255,7 @@ impl<Node: SegmentTreeNode> SegmentTree<Node> {
                 &mut |left, right, _| wh(left, right),
                 calc,
             )
-                .ok()
+            .ok()
         } else {
             None
         }
@@ -316,7 +316,7 @@ impl<Node: SegmentTreeNode> SegmentTree<Node> {
                 &mut |left, right, _| wh(left, right),
                 calc,
             )
-                .ok()
+            .ok()
         } else {
             None
         }
@@ -377,7 +377,7 @@ impl<Node: SegmentTreeNode> SegmentTree<Node> {
                 Some(node.clone())
             }
         })
-            .unwrap_or_default()
+        .unwrap_or_default()
     }
 
     pub fn for_each_mut<R: Default>(

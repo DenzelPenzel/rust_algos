@@ -1,5 +1,5 @@
-use crate::graph::Graph;
 use crate::graph::edges::edge_trait::EdgeTrait;
+use crate::graph::Graph;
 use std::collections::VecDeque;
 
 pub trait TopoSort {
@@ -37,6 +37,10 @@ impl<E: EdgeTrait> TopoSort for Graph<E> {
             }
         }
 
-        if res.len() == n { Some(res) } else { None }
+        if res.len() == n {
+            Some(res)
+        } else {
+            None
+        }
     }
 }

@@ -1,17 +1,17 @@
+use crate::collections::link_cut::LinkCutNode;
 use crate::collections::payload::Payload;
+use crate::collections::vec_ext::gen_vec::VecGen;
 use crate::graph::edges::flow_edge_trait::FlowEdgeTrait;
 use crate::graph::Graph;
 use crate::numbers::num_traits::algebra::AdditionMonoidWithSub;
 use crate::numbers::ord::MinMax;
-use crate::collections::vec_ext::gen_vec::VecGen;
-use crate::collections::link_cut::LinkCutNode;
 
 pub trait FastMaxFlow<C: AdditionMonoidWithSub + Ord + Copy + MinMax> {
     fn fast_max_flow(&mut self, source: usize, target: usize) -> C;
 }
 
 impl<C: AdditionMonoidWithSub + Ord + Copy + MinMax, E: FlowEdgeTrait<C>> FastMaxFlow<C>
-for Graph<E>
+    for Graph<E>
 {
     fn fast_max_flow(&mut self, source: usize, target: usize) -> C {
         struct Node<C: AdditionMonoidWithSub + Ord + Copy + MinMax> {

@@ -42,12 +42,12 @@ struct Solution;
 impl Solution {
     pub fn count_pairs(words: Vec<String>) -> i64 {
         if words.len() == 1 {
-            return 0
+            return 0;
         }
 
         fn get_key(word: &str) -> Vec<u8> {
             if word.len() == 1 {
-                return Vec::new()
+                return Vec::new();
             }
 
             let bytes = word.as_bytes();
@@ -58,7 +58,7 @@ impl Solution {
                 let b = w[1];
                 let diff = (b as i16 - a as i16 + 26) % 26;
                 res.push(diff as u8);
-            } 
+            }
 
             res
         }
@@ -73,17 +73,22 @@ impl Solution {
         for &freq in counter.values() {
             res += freq * (freq - 1) / 2;
         }
-        
+
         res
     }
 }
 
-
 #[test]
 fn run_test() {
-    let words = vec!["fusion", "layout"].into_iter().map(|s| s.to_string()).collect();
+    let words = vec!["fusion", "layout"]
+        .into_iter()
+        .map(|s| s.to_string())
+        .collect();
     assert_eq!(Solution::count_pairs(words), 1);
 
-    let words = vec!["ab","aa","za","aa"].into_iter().map(|s| s.to_string()).collect();
+    let words = vec!["ab", "aa", "za", "aa"]
+        .into_iter()
+        .map(|s| s.to_string())
+        .collect();
     assert_eq!(Solution::count_pairs(words), 2);
 }

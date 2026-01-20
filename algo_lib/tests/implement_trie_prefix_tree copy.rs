@@ -24,8 +24,8 @@ impl Trie {
     fn insert(&mut self, word: String) {
         let mut node = &mut self.root;
         for &byte in word.as_bytes() {
-            let idx = Self::byte_to_index(byte)
-                .expect("word must contain only lowercase ASCII letters");
+            let idx =
+                Self::byte_to_index(byte).expect("word must contain only lowercase ASCII letters");
             node = node.children[idx]
                 .get_or_insert_with(|| Box::new(Node::new()))
                 .as_mut();

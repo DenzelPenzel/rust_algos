@@ -1,7 +1,7 @@
 /*
 You are given an integer array nums.
 
-A subarray of nums is called centered if the sum of its elements is equal 
+A subarray of nums is called centered if the sum of its elements is equal
 to at least one element within that same subarray.
 
 Return the number of centered subarrays of nums.
@@ -34,7 +34,7 @@ impl Solution {
     pub fn centered_subarrays(nums: Vec<i32>) -> i32 {
         let mut res = 0;
         let n = nums.len();
-        
+
         for i in 0..n {
             let mut seen: HashSet<i32> = HashSet::new();
             let mut current = 0;
@@ -45,7 +45,6 @@ impl Solution {
                     res += 1;
                 }
             }
-
         }
 
         res

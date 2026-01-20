@@ -7,7 +7,7 @@ A prefix of s is called a residue if the number of distinct characters in the pr
 Return the count of residue prefixes in s.
 
 A prefix of a string is a non-empty substring that starts from the beginning of the string and extends to any point within it.
- 
+
 Example 1:
     Input: s = "abc"
     Output: 2
@@ -29,7 +29,7 @@ Example 3:
     Explanation:
         Prefix "b" has 1 distinct character and length modulo 3 is 1, so it is a residue.
         Prefix "bo" has 2 distinct characters and length mod 3 is 2, so it is a residue. Thus, the answer is 2.
-    
+
 Constraints:
     1 <= s.length <= 100
     s contains only lowercase English letters.
@@ -44,7 +44,7 @@ impl Solution {
         let mut res = 0;
         let mut seen: HashSet<char> = HashSet::new();
         for (i, v) in s.chars().enumerate() {
-            seen.insert(v); 
+            seen.insert(v);
             if seen.len() == (i + 1) % 3 {
                 res += 1
             }
@@ -52,7 +52,6 @@ impl Solution {
         res
     }
 }
-
 
 #[test]
 fn run_test() {

@@ -1,6 +1,6 @@
 use crate::collections::min_max::MinimMaxim;
-use crate::graph::Graph;
 use crate::graph::edges::edge_trait::EdgeTrait;
+use crate::graph::Graph;
 use crate::helpers::recursive_function::{Callable2, RecursiveFunction2};
 use std::collections::HashSet;
 
@@ -57,8 +57,8 @@ impl<E: EdgeTrait> BridgeSearch for Graph<E> {
 #[cfg(test)]
 mod tests {
     use super::BridgeSearch;
-    use crate::graph::Graph;
     use crate::graph::edges::bi_edge::BiEdge;
+    use crate::graph::Graph;
 
     //   0 -- 2
     //   |  /

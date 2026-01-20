@@ -15,33 +15,33 @@ Notice that when there are two middle position choices,
 the operation is performed on the frontmost middle position choice.
 
 For example:
-	Pushing 6 into the middle of [1, 2, 3, 4, 5] results in [1, 2, 6, 3, 4, 5].
-	Popping the middle from [1, 2, 3, 4, 5, 6] returns 3 and results in [1, 2, 4, 5, 6].
+    Pushing 6 into the middle of [1, 2, 3, 4, 5] results in [1, 2, 6, 3, 4, 5].
+    Popping the middle from [1, 2, 3, 4, 5, 6] returns 3 and results in [1, 2, 4, 5, 6].
 
 
 Example 1:
-	Input:
-	["FrontMiddleBackQueue", "pushFront", "pushBack", "pushMiddle", "pushMiddle", "popFront", "popMiddle", "popMiddle", "popBack", "popFront"]
-	[[], [1], [2], [3], [4], [], [], [], [], []]
+    Input:
+    ["FrontMiddleBackQueue", "pushFront", "pushBack", "pushMiddle", "pushMiddle", "popFront", "popMiddle", "popMiddle", "popBack", "popFront"]
+    [[], [1], [2], [3], [4], [], [], [], [], []]
 
-	Output:
-		[null, null, null, null, null, 1, 3, 4, 2, -1]
+    Output:
+        [null, null, null, null, null, 1, 3, 4, 2, -1]
 
-	Explanation:
-		FrontMiddleBackQueue q = new FrontMiddleBackQueue();
-		q.pushFront(1);   // [1]
-		q.pushBack(2);    // [1, 2]
-		q.pushMiddle(3);  // [1, 3, 2]
-		q.pushMiddle(4);  // [1, 4, 3, 2]
-		q.popFront();     // return 1 -> [4, 3, 2]
-		q.popMiddle();    // return 3 -> [4, 2]
-		q.popMiddle();    // return 4 -> [2]
-		q.popBack();      // return 2 -> []
-		q.popFront();     // return -1 -> [] (The queue is empty)
+    Explanation:
+        FrontMiddleBackQueue q = new FrontMiddleBackQueue();
+        q.pushFront(1);   // [1]
+        q.pushBack(2);    // [1, 2]
+        q.pushMiddle(3);  // [1, 3, 2]
+        q.pushMiddle(4);  // [1, 4, 3, 2]
+        q.popFront();     // return 1 -> [4, 3, 2]
+        q.popMiddle();    // return 3 -> [4, 2]
+        q.popMiddle();    // return 4 -> [2]
+        q.popBack();      // return 2 -> []
+        q.popFront();     // return -1 -> [] (The queue is empty)
 
 Constraints:
-	1 <= val <= 109
-	At most 1000 calls will be made to pushFront, pushMiddle, pushBack, popFront, popMiddle, and popBack.
+    1 <= val <= 109
+    At most 1000 calls will be made to pushFront, pushMiddle, pushBack, popFront, popMiddle, and popBack.
 */
 
 use std::collections::VecDeque;
@@ -94,7 +94,7 @@ impl FrontMiddleBackQueue {
 
     fn pop_front(&mut self) -> i32 {
         if self.is_empty() {
-            return -1
+            return -1;
         }
         let val = self.left.pop_front().unwrap();
         self.balance();
@@ -103,7 +103,7 @@ impl FrontMiddleBackQueue {
 
     fn pop_middle(&mut self) -> i32 {
         if self.is_empty() {
-            return -1
+            return -1;
         }
 
         let val = self.left.pop_back().unwrap();
@@ -113,7 +113,7 @@ impl FrontMiddleBackQueue {
 
     fn pop_back(&mut self) -> i32 {
         if self.is_empty() {
-            return -1
+            return -1;
         }
         let val = if self.right.len() == 0 {
             self.left.pop_back().unwrap()

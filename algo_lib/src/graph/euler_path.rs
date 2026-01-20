@@ -1,6 +1,6 @@
-use crate::graph::Graph;
 use crate::graph::edges::bi_edge::BiEdgeWithId;
 use crate::graph::edges::edge_trait::EdgeTrait;
+use crate::graph::Graph;
 use crate::helpers::ext::option::OptionExt;
 use std::collections::HashSet;
 
@@ -48,8 +48,8 @@ impl<P: Clone> EulerPath for Graph<BiEdgeWithId<P>> {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::graph::Graph;
     use crate::graph::edges::bi_edge::BiEdgeWithId;
+    use crate::graph::Graph;
     use std::collections::HashSet;
 
     fn is_valid_euler_path(g: &Graph<BiEdgeWithId<()>>, path: &[usize]) -> bool {
