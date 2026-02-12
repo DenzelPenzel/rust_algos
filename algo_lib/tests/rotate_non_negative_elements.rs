@@ -5,8 +5,8 @@ Rotate only the non-negative elements of the array to the left by k positions, i
 
 All negative elements must stay in their original positions and must not move.
 
-After rotation, place the non-negative elements back into 
-the array in the new order, filling only the positions 
+After rotation, place the non-negative elements back into
+the array in the new order, filling only the positions
 that originally contained non-negative values and skipping all negative positions.
 
 Return the resulting array.
@@ -35,7 +35,7 @@ Example 3:
         The non-negative elements, in order, are [5, 4, 6].
         Left rotation with k = 2 results in [6, 5, 4].
         Placing them back into the non-negative indices results in [6, 5, -9, 4].
-    
+
 Constraints:
     1 <= nums.length <= 10^5
     -10^5 <= nums[i] <= 10^5
@@ -47,26 +47,20 @@ struct Solution;
 impl Solution {
     pub fn rotate_elements(nums: Vec<i32>, k: i32) -> Vec<i32> {
         let mut pos: Vec<i32> = nums.iter().filter(|&x| *x >= 0).copied().collect();
-        
+
         if pos.is_empty() {
             return nums;
         }
 
         let n = pos.len();
         let k = (k as usize) % n;
-        
+
         pos.rotate_left(k);
 
         let mut pos_iter = pos.into_iter();
 
-        nums.into_iter().map(|x| {
-            if x < 0 {
-                x
-            } else {
-                pos_iter.next().unwrap()
-            }
-        })
-        .collect()
-
+        nums.into_iter()
+            .map(|x| if x < 0 { x } else { pos_iter.next().unwrap() })
+            .collect()
     }
 }

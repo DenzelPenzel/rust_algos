@@ -1,8 +1,8 @@
 /*
 You are given two positive integers n and k.
 
-Return an integer denoting the nth smallest positive integer that 
-has exactly k ones in its binary representation. 
+Return an integer denoting the nth smallest positive integer that
+has exactly k ones in its binary representation.
 
 It is guaranteed that the answer is strictly less than 250.
 
@@ -24,20 +24,19 @@ Example 2:
         1 = 12
         2 = 102
         4 = 1002
-    
+
 Constraints:
     1 <= n <= 250
     1 <= k <= 50
     The answer is strictly less than 250.
 */
 
-struct Solution; 
+struct Solution;
 
 impl Solution {
     pub fn nth_smallest(n: i64, k: i32) -> i64 {
         let mut lo = 1;
         let mut hi = 1u64 << 50;
-        
 
         fn comb(n: u64, r: u64) -> u64 {
             if r > n {
@@ -88,7 +87,7 @@ impl Solution {
             let mid = lo + ((hi - lo) >> 1);
             let cnt = count_le(mid);
 
-            if cnt >= n_u64  {
+            if cnt >= n_u64 {
                 res = mid as i64;
                 hi = mid;
             } else {

@@ -3,7 +3,7 @@ You are given an integer array nums.
 
 You need to remove exactly one prefix (possibly empty) from nums.
 
-Return an integer denoting the minimum length of the 
+Return an integer denoting the minimum length of the
 removed prefix such that the remaining array is strictly increasing.
 
 Example 1:
@@ -22,7 +22,7 @@ Example 3:
     Input: nums = [1,2,3,4]
     Output: 0
     Explanation:
-        The array nums = [1, 2, 3, 4] is already strictly increasing 
+        The array nums = [1, 2, 3, 4] is already strictly increasing
         so removing an empty prefix is sufficient.
 
 Constraints:

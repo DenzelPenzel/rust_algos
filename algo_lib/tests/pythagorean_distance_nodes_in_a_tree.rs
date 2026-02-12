@@ -1,6 +1,6 @@
 /*
-You are given an integer n and an undirected tree with 
-n nodes numbered from 0 to n - 1. The tree is represented by a 2D array edges of length n - 1, 
+You are given an integer n and an undirected tree with
+n nodes numbered from 0 to n - 1. The tree is represented by a 2D array edges of length n - 1,
 where edges[i] = [ui, vi] indicates an undirected edge between ui and vi.
 
 You are also given three distinct target nodes x, y, and z.
@@ -14,7 +14,7 @@ The node u is called special if the three distances form a Pythagorean Triplet.
 
 Return an integer denoting the number of special nodes in the tree.
 
-A Pythagorean triplet consists of three integers a, b, and c which, 
+A Pythagorean triplet consists of three integers a, b, and c which,
 when sorted in ascending order, satisfy a2 + b2 = c2.
 
 The distance between two nodes in a tree is the number of edges on the unique path between them.
@@ -68,24 +68,23 @@ use std::mem;
 
 struct Solution;
 
-
 struct TreeDistance {
     n: usize,
     log: usize,
     depth: Vec<usize>,
     // up[u][i] stores the 2^i-th ancestor of u
-    up: Vec<Vec<usize>>
+    up: Vec<Vec<usize>>,
 }
 
-
 impl TreeDistance {
+    // LCA (longest common ancestor)
     pub fn new(n: usize, edges: &[(usize, usize)], root: usize) -> Self {
         let mut adj = vec![vec![]; n as usize];
 
         for &(u, v) in edges {
             adj[u].push(v);
             adj[v].push(u);
-        } 
+        }
 
         // Calculate max power of 2 needed (log2(10^5) is approx 17)
         let log = (usize::BITS - n.leading_zeros()) as usize;
@@ -93,11 +92,11 @@ impl TreeDistance {
         let mut up = vec![vec![root; log]; n as usize];
 
         let mut stack = vec![(root, root, 0)];
-        
+
         while let Some((u, p, d)) = stack.pop() {
             depth[u] = d;
             up[u][0] = p; // 2^0 ancestor is parent
-            
+
             for &v in &adj[u] {
                 if v == p {
                     continue;
@@ -113,22 +112,15 @@ impl TreeDistance {
             }
         }
 
-        TreeDistance {
-            n,
-            log,
-            depth,
-            up,
-        }
-
+        TreeDistance { n, log, depth, up }
     }
-
 
     pub fn find_lca(&self, mut u: usize, mut v: usize) -> usize {
         // Ensure u is the deeper node
         if self.depth[u] < self.depth[v] {
             mem::swap(&mut u, &mut v);
         }
-        
+
         // Lift u up to the same depth as v
         let diff = self.depth[u] - self.depth[v];
         for i in 0..self.log {
@@ -148,7 +140,7 @@ impl TreeDistance {
                 v = self.up[v][i];
             }
         }
-        
+
         // The parent of u (or v) is the LCA
         self.up[u][0]
     }
@@ -159,21 +151,22 @@ impl TreeDistance {
     }
 }
 
-
 impl Solution {
     pub fn special_nodes(n: i32, edges: Vec<Vec<i32>>, x: i32, y: i32, z: i32) -> i32 {
         let mut res = 0;
         let n = n as usize;
-        let edges: Vec<(usize, usize)> = edges.iter().map(|p| (p[0] as usize, p[1] as usize)).collect();
+        let edges: Vec<(usize, usize)> = edges
+            .iter()
+            .map(|p| (p[0] as usize, p[1] as usize))
+            .collect();
 
         let tree = TreeDistance::new(n, &edges, 0);
-    
+
         for u in 0..n {
             let dx = tree.get_dist(u, x as usize);
             let dy = tree.get_dist(u, y as usize);
             let dz = tree.get_dist(u, z as usize);
-            
-            
+
             let mut dists = vec![dx, dy, dz];
             dists.sort_unstable();
 
@@ -182,7 +175,7 @@ impl Solution {
             }
         }
 
-        res 
+        res
     }
 }
 

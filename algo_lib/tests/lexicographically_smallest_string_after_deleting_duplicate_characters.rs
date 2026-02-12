@@ -18,7 +18,7 @@ Example 2:
     Output: "z"
     Explanation:
         We cannot perform any operations. The only string we can form is "z".
- 
+
 Constraints:
     1 <= s.length <= 105
     s contains lowercase English letters only.
@@ -30,7 +30,7 @@ impl Solution {
     pub fn lex_smallest_after_deletion(s: String) -> String {
         let s_bytes = s.as_bytes();
         let mut st = Vec::new();
-        let mut freq = vec![0; 26]; 
+        let mut freq = vec![0; 26];
 
         for &b in s_bytes {
             freq[(b - b'a') as usize] += 1
@@ -43,7 +43,7 @@ impl Solution {
 
             while let Some(&top) = st.last() {
                 let top_idx = (top - b'a') as usize;
-                
+
                 if top > b && (in_stack[top_idx] + freq[top_idx] > 1) {
                     st.pop();
                     in_stack[top_idx] -= 1;

@@ -1,6 +1,6 @@
 /*
 
-You are given two integer arrays costs and capacity, both of length n, 
+You are given two integer arrays costs and capacity, both of length n,
 where costs[i] represents the purchase cost of the ith machine and capacity[i] represents its performance capacity.
 
 You are also given an integer budget.
@@ -32,7 +32,7 @@ Example 3:
         Choose two machines with costs[1] = 2 and costs[2] = 2.
         The total cost is 2 + 2 = 4, which is strictly less than budget = 5.
         The maximum total capacity is capacity[1] + capacity[2] = 5 + 4 = 9.
-    
+
 Constraints:
     1 <= n == costs.length == capacity.length <= 105
     1 <= costs[i], capacity[i] <= 105
@@ -49,7 +49,7 @@ impl Solution {
         let n = costs.len();
         let mut res = 0;
         let mut tmp = Vec::with_capacity(n);
-        
+
         for i in 0..n {
             if costs[i] < budget {
                 res = cmp::max(res, capacity[i])
@@ -73,7 +73,7 @@ impl Solution {
                 break;
             }
             let rem = budget - tmp[j].0;
-            let i =  sorted_costs.partition_point(|&x| x < rem);
+            let i = sorted_costs.partition_point(|&x| x < rem);
             let mut i_idx = i as isize - 1;
 
             if i_idx >= j as isize {
@@ -95,8 +95,8 @@ mod tests {
 
     #[test]
     fn test_max_capacity() {
-        let costs = vec![4,8,5,3];
-        let capacity = vec![1,5,2,7];
+        let costs = vec![4, 8, 5, 3];
+        let capacity = vec![1, 5, 2, 7];
         let budget = 8;
         let cap = Solution::max_capacity(costs, capacity, budget);
         assert_eq!(cap, 8)
