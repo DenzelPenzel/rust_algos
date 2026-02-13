@@ -39,6 +39,7 @@ use std::{collections::VecDeque, i32};
 struct Solution;
 
 impl Solution {
+    // SPFA
     pub fn min_cost(n: i32, edges: Vec<Vec<i32>>) -> i32 {
         let n = n as usize;
         let mut graph = vec![vec![]; n];        
