@@ -13,7 +13,8 @@
 //     }
 // }
 
-use std::collections::{BTreeSet, HashSet};
+use std::cmp::{max, Ordering, Reverse};
+use std::collections::{BTreeSet, BinaryHeap, HashSet, VecDeque};
 use std::sync::atomic::Ordering;
 use std::{cmp, collections::HashMap};
 
@@ -44,7 +45,7 @@ use std::{cmp, collections::HashMap};
 //     }
 // }
 
-use std::{cmp, i32, vec};
+use std::{cmp, i32, i64, mem, vec};
 
 // impl Solution {
 //     pub fn rob(nums: Vec<i32>, colors: Vec<i32>) -> i64 {
@@ -88,12 +89,11 @@ use std::{cmp, i32, vec};
 //     }
 // }
 
-
 // impl Solution {
 //     pub fn palindrome_path(n: i32, edges: Vec<Vec<i32>>, s: String, queries: Vec<String>) -> Vec<bool> {
 //         let n = n as usize;
 //         let mut graph = vec![vec![]; n];
-        
+
 //         for edge in edges {
 //             let u = edge[0] as usize;
 //             let v = edge[1] as usize;
@@ -114,7 +114,6 @@ use std::{cmp, i32, vec};
 
 //         Self::dfs_hld(0, 0, &graph, &parent, &mut head, &mut pos, &mut cur_pos, &heavy_child);
 
-
 //         let mut tree = vec![0; 4 * n];
 //         let chars = s.as_bytes();
 
@@ -123,14 +122,12 @@ use std::{cmp, i32, vec};
 //             Self::update_tree(1, 0, n - 1, pos[i], val, &mut tree);
 //         }
 
-
 //         let mut res: Vec<bool> = Vec::new();
-
 
 //         for q in queries {
 //             let mut parts = q.split_ascii_whitespace();
 //             let type_str = parts.next().unwrap();
-            
+
 //             if type_str == "update" {
 //                 let u = parts.next().unwrap().parse::<usize>().unwrap();
 //                 let c_str = parts.next().unwrap();
@@ -153,13 +150,13 @@ use std::{cmp, i32, vec};
 //     }
 
 //     fn dfs(
-//         u: usize, 
-//         p: usize, 
-//         d: usize, 
-//         graph: &Vec<Vec<usize>>, 
-//         parent: &mut Vec<usize>, 
-//         depth: &mut Vec<usize>, 
-//         size: &mut Vec<usize>, 
+//         u: usize,
+//         p: usize,
+//         d: usize,
+//         graph: &Vec<Vec<usize>>,
+//         parent: &mut Vec<usize>,
+//         depth: &mut Vec<usize>,
+//         size: &mut Vec<usize>,
 //         heavy_child: &mut Vec<Option<usize>>,
 //     ) {
 //         parent[u] = p;
@@ -176,7 +173,7 @@ use std::{cmp, i32, vec};
 //                 }
 //             }
 //         }
-//     } 
+//     }
 
 //     fn dfs_hld(
 //         u: usize,
@@ -270,7 +267,7 @@ use std::{cmp, i32, vec};
 
 //         for &x in &nums {
 //             *mp.entry(x).or_insert(0) += 1;
-//         }   
+//         }
 
 //         let mut unique: Vec<i32> = mp.keys().cloned().collect();
 //         unique.sort_unstable();
@@ -291,11 +288,9 @@ use std::{cmp, i32, vec};
 //     }
 // }
 
-
-
 // impl Solution {
 //     pub fn merge_characters(s: String, k: i32) -> String {
-//         let mut mp = HashMap::new();        
+//         let mut mp = HashMap::new();
 //         let mut seen: HashMap<char, usize> = HashMap::new();
 //         let mut res: Vec<char> = Vec::with_capacity(s.len());
 //         let k = k as usize;
@@ -385,10 +380,9 @@ use std::{cmp, collections::HashMap};
 //         } else {
 //             vec![ops0, min0.min(min1)]
 //         }
-        
+
 //     }
 // }
-
 
 // impl Solution {
 //     pub fn sum_of_numbers(l: i32, r: i32, k: i32) -> i32 {
@@ -428,9 +422,6 @@ use std::{cmp, collections::HashMap};
 //     }
 // }
 
-
-
-
 // use std::{cmp, collections::HashMap};
 
 // impl Solution {
@@ -443,7 +434,7 @@ use std::{cmp, collections::HashMap};
 //         let solve = |pos: i32| {
 //             let mut pairs: Vec<_> = Vec::new();
 //             let mut ops = 0;
-            
+
 //             for (i, &x) in nums.iter().enumerate() {
 //                 let t = (pos + i as i32) % 2;
 //                 if x.rem_euclid(2) == t {
@@ -501,8 +492,6 @@ use std::{cmp, collections::HashMap};
 //     }
 // }
 
-use std::cmp::Ordering;
-
 struct UnionFind {
     parent: Vec<usize>,
     weight: Vec<usize>,
@@ -551,11 +540,11 @@ impl UnionFind {
         if self.size[root_x] > self.size[root_y] {
             self.parent[root_y] = root_x;
             self.size[root_x] += self.size[root_y];
-            self.weight[root_y] = self.weight[x] ^ self. weight[y] ^ val;
+            self.weight[root_y] = self.weight[x] ^ self.weight[y] ^ val;
         } else {
             self.parent[root_x] = root_y;
             self.size[root_y] += self.size[root_x];
-            self.weight[root_x] = self.weight[x] ^ self. weight[y] ^ val;
+            self.weight[root_x] = self.weight[x] ^ self.weight[y] ^ val;
         }
 
         true
@@ -580,7 +569,6 @@ impl Solution {
         res
     }
 }
-
 
 struct UF {
     parent: Vec<usize>,
@@ -620,7 +608,7 @@ impl UF {
         let root_y = self.find(y);
 
         if root_x == root_y {
-            return false
+            return false;
         }
 
         if self.size[root_x] > self.size[root_y] {
@@ -632,5 +620,648 @@ impl UF {
         }
 
         true
-    }}
+    }
+}
 
+impl Solution {
+    pub fn filter_occupied_intervals(
+        mut occupied_intervals: Vec<Vec<i32>>,
+        free_start: i32,
+        free_end: i32,
+    ) -> Vec<Vec<i32>> {
+        if occupied_intervals.is_empty() {
+            return vec![];
+        }
+
+        occupied_intervals.sort_by_key(|v| v[0]);
+
+        let mut merged: Vec<(i64, i64)> = Vec::new();
+
+        for interval in occupied_intervals {
+            let s = interval[0] as i64;
+            let e = interval[1] as i64;
+
+            if let Some(prev) = merged.last_mut() {
+                if prev.1 < s {
+                    merged.push((s, e));
+                } else {
+                    prev.1 = prev.1.max(e);
+                }
+            } else {
+                merged.push((s, e));
+            }
+        }
+
+        let free_start = free_start as i64;
+        let free_end = free_end as i64;
+        let mut ans = Vec::new();
+
+        for (s, e) in merged {
+            if e < free_start || s > free_end {
+                ans.push(vec![s as i32, e as i32]);
+            } else {
+                if s < free_start {
+                    ans.push(vec![s as i32, (free_start - 1) as i32]);
+                }
+
+                if e > free_end {
+                    ans.push(vec![(free_end + 1) as i32, e as i32]);
+                }
+            }
+        }
+
+        ans
+    }
+}
+
+impl Solution {
+    pub fn max_sum(nums: Vec<i32>, k: i32, mul: i32) -> i64 {
+        let mut pos = Vec::new();
+        let mut neg = Vec::new();
+        let mut res = 0i64;
+        let mut zeros = 0;
+
+        for num in nums {
+            if num > 0 {
+                pos.push(num as i64);
+            } else if num < 0 {
+                neg.push(num as i64);
+            } else {
+                zeros += 1;
+            }
+        }
+
+        pos.sort_unstable_by(|a, b| b.cmp(a));
+        neg.sort_unstable();
+
+        let mut i = 0;
+        let mut j = 0;
+
+        for s in 0..k as usize {
+            let cur_mul = mul as i64 - s as i64;
+            let mut best = i64::MIN;
+            let mut take = 0;
+
+            if i < pos.len() {
+                let x = pos[i];
+                let val = x.max(x * cur_mul);
+
+                if val > best {
+                    best = val;
+                    take = 1;
+                }
+            }
+
+            if j < neg.len() {
+                let x = neg[i];
+                let val = x.max(x * cur_mul);
+
+                if val > best {
+                    best = val;
+                    take = 2;
+                }
+            }
+
+            if zeros > 0 && 0 > best {
+                best = 0;
+                take = 3;
+            }
+
+            if take == 1 {
+                i += 1;
+            } else if take == 2 {
+                j += 1
+            } else {
+                zeros -= 1;
+            }
+
+            res += best;
+        }
+
+        res as i64
+    }
+}
+
+impl Solution {
+    pub fn max_subarray_sum(nums: Vec<i32>, k: i32) -> i64 {
+        fn solve(nums: &[i32], change: impl Fn(i64) -> i64) -> i64 {
+            let first = nums[0] as i64;
+            let neg = i64::MIN / 4;
+
+            let mut dp0 = first;
+            let mut dp1 = change(first);
+            let mut dp2 = neg;
+
+            let mut res = dp1;
+            let n = nums.len();
+
+            for i in 1..n {
+                let num = nums[i] as i64;
+                let x = change(num);
+                let nx0 = (dp0 + num).max(num);
+                let nx1 = (dp0 + x).max(dp1 + x).max(x);
+                let nx2 = (dp2 + num).max(dp1 + num);
+
+                dp0 = nx0;
+                dp1 = nx1;
+                dp2 = nx2;
+
+                res = res.max(nx1).max(nx2);
+            }
+
+            res
+        }
+
+        let k = k as i64;
+        let multiply = solve(&nums, |x| x * k);
+        let divide = solve(&nums, |x| x / k);
+
+        multiply.max(divide)
+    }
+}
+
+impl Solution {
+    pub fn min_time_max_power(
+        n: i32,
+        edges: Vec<Vec<i32>>,
+        power: i32,
+        cost: Vec<i32>,
+        source: i32,
+        target: i32,
+    ) -> Vec<i64> {
+        let power = power as usize;
+        let source = source as usize;
+        let target = target as usize;
+        let n = n as usize;
+        let mut graph = vec![vec![]; n];
+
+        for edge in edges {
+            let u = edge[0] as usize;
+            let v = edge[1] as usize;
+            let t = edge[2] as i64;
+            graph[u].push((v, t));
+        }
+
+        let inf = i64::MAX / 4;
+        let mut queue = BinaryHeap::new();
+        let mut dist = vec![vec![inf; power + 1]; n];
+
+        queue.push(Reverse((0i64, source, power)));
+        dist[source][power] = 0;
+
+        while let Some(Reverse((time, node, remain))) = queue.pop() {
+            let need = cost[node] as usize;
+
+            if remain < need {
+                continue;
+            }
+
+            let next_rem = remain - need;
+
+            for &(next_node, next_time) in &graph[node] {
+                if dist[next_node][next_rem] > time + next_time {
+                    dist[next_node][next_rem] = time + next_time;
+                    queue.push(Reverse((time + next_time, next_node, next_rem)));
+                }
+            }
+        }
+
+        let min_time = dist[target].iter().min().copied().unwrap();
+
+        if min_time == inf {
+            return vec![-1, -1];
+        }
+
+        let mut max_power = 0i64;
+
+        for remain in 0..=power {
+            if dist[target][remain] == min_time {
+                max_power = remain as i64;
+            }
+        }
+
+        vec![min_time, max_power]
+    }
+}
+
+impl Solution {
+    pub fn max_distance(moves: String) -> i32 {
+        let mut x: i32 = 0;
+        let mut y: i32 = 0;
+        let mut free = 0;
+
+        for ch in moves.chars() {
+            match ch {
+                'U' => y += 1,
+                'D' => y -= 1,
+                'R' => x += 1,
+                'L' => x -= 1,
+                '_' => free += 1,
+                _ => {}
+            }
+        }
+
+        x.abs() + y.abs() + free
+    }
+}
+
+impl Solution {
+    pub fn count_valid_subarrays(nums: Vec<i32>, x: i32) -> i32 {
+        fn first(mut num: i64) -> i64 {
+            while num >= 10 {
+                num /= 10;
+            }
+            num
+        }
+
+        let n = nums.len() as usize;
+        let x = x as i64;
+        let mut pref = vec![0i64; n + 1];
+        for i in 0..n {
+            pref[i + 1] = pref[i] + nums[i] as i64;
+        }
+
+        let mut res = 0;
+
+        for i in 0..n {
+            for j in i..n {
+                let sum = pref[j + 1] - pref[i];
+
+                if sum % 10 == x && first(sum) == x {
+                    res += 1;
+                }
+            }
+        }
+
+        res
+    }
+}
+
+impl Solution {
+    pub fn shortest_path(n: i32, edges: Vec<Vec<i32>>, labels: String, k: i32) -> i32 {
+        let n = n as usize;
+        let k = k as usize;
+        let labels = labels.as_bytes();
+
+        let mut graph = vec![vec![]; n];
+
+        for edge in edges {
+            let u = edge[0] as usize;
+            let v = edge[1] as usize;
+            let w = edge[2] as i64;
+            graph[u].push((v, w));
+        }
+
+        let inf = i64::MAX / 4;
+        let mut queue = BinaryHeap::new();
+        let mut dist = vec![vec![inf; k + 1]; n];
+
+        dist[0][1] = 0;
+        queue.push(Reverse((0, 0usize, 1usize)));
+
+        while let Some(Reverse((cost, node, streak))) = queue.pop() {
+            for &(next_node, w) in &graph[node] {
+                let next_streak = if labels[node] == labels[next_node] {
+                    streak + 1
+                } else {
+                    1
+                };
+
+                if next_streak > k {
+                    continue;
+                }
+
+                let next_cost = cost + w;
+
+                if next_cost < dist[next_node][next_streak] {
+                    dist[next_node][next_streak] = next_cost;
+                    queue.push(Reverse((next_cost, next_node, next_streak)));
+                }
+            }
+        }
+
+        let res = dist[n - 1].iter().copied().min().unwrap();
+
+        if res == inf {
+            -1
+        } else {
+            res as i32
+        }
+    }
+}
+
+use std::collections::HashMap;
+
+impl Solution {
+    pub fn interleave_characters(word1: String, word2: String, target: String) -> i32 {
+        const MOD: i64 = 1_000_000_007;
+
+        type Key = (usize, usize, usize, usize);
+
+        fn dfs(
+            i: usize,
+            p1: usize,
+            p2: usize,
+            mask: usize,
+            w1: &[u8],
+            w2: &[u8],
+            target: &[u8],
+            memo: &mut HashMap<Key, i64>,
+            memo1: &mut HashMap<Key, i64>,
+            memo2: &mut HashMap<Key, i64>,
+        ) -> i64 {
+            if i == target.len() {
+                return if mask == 3 { 1 } else { 0 };
+            }
+
+            let key = (i, p1, p2, mask);
+
+            if let Some(&val) = memo.get(&key) {
+                return val;
+            }
+
+            let res = (sum1(i, p1, p2, mask, w1, w2, target, memo, memo1, memo2)
+                + sum2(i, p1, p2, mask, w1, w2, target, memo, memo1, memo2))
+                % MOD;
+
+            memo.insert(key, res);
+
+            res
+        }
+
+        fn sum1(
+            i: usize,
+            p1: usize,
+            p2: usize,
+            mask: usize,
+            w1: &[u8],
+            w2: &[u8],
+            target: &[u8],
+            memo: &mut HashMap<Key, i64>,
+            memo1: &mut HashMap<Key, i64>,
+            memo2: &mut HashMap<Key, i64>,
+        ) -> i64 {
+            if p1 == w1.len() {
+                return 0;
+            }
+
+            let key = (i, p1, p2, mask);
+
+            if let Some(&val) = memo1.get(&key) {
+                return val;
+            }
+
+            let mut res = sum1(i, p1 + 1, p2, mask, w1, w2, target, memo, memo1, memo2);
+
+            if w1[p1] == target[i] {
+                res += dfs(
+                    i + 1,
+                    p1 + 1,
+                    p2,
+                    mask | 1,
+                    w1,
+                    w2,
+                    target,
+                    memo,
+                    memo1,
+                    memo2,
+                );
+                res %= MOD;
+            }
+
+            memo1.insert(key, res);
+            res
+        }
+
+        fn sum2(
+            i: usize,
+            p1: usize,
+            p2: usize,
+            mask: usize,
+            w1: &[u8],
+            w2: &[u8],
+            target: &[u8],
+            memo: &mut HashMap<Key, i64>,
+            memo1: &mut HashMap<Key, i64>,
+            memo2: &mut HashMap<Key, i64>,
+        ) -> i64 {
+            if p2 == w2.len() {
+                return 0;
+            }
+
+            let key = (i, p1, p2, mask);
+
+            if let Some(&val) = memo2.get(&key) {
+                return val;
+            }
+
+            let mut res = sum2(i, p1, p2 + 1, mask, w1, w2, target, memo, memo1, memo2);
+
+            if w2[p2] == target[i] {
+                res += dfs(
+                    i + 1,
+                    p1,
+                    p2 + 1,
+                    mask | 2,
+                    w1,
+                    w2,
+                    target,
+                    memo,
+                    memo1,
+                    memo2,
+                );
+                res %= MOD;
+            }
+
+            memo2.insert(key, res);
+            res
+        }
+
+        let w1 = word1.into_bytes();
+        let w2 = word2.into_bytes();
+        let target = target.into_bytes();
+        let mut memo = HashMap::new();
+        let mut memo1 = HashMap::new();
+        let mut memo2 = HashMap::new();
+
+        dfs(
+            0, 0, 0, 0, &w1, &w2, &target, &mut memo, &mut memo1, &mut memo2,
+        ) as i32
+    }
+}
+
+impl Solution {
+    pub fn min_operations(s1: String, s2: String) -> i32 {
+        fn one_pos_cost(s1: u8, s2: u8, cnt: usize) -> i32 {
+            let inf = 1_000_000_000;
+            if cnt == 0 {
+                return match (s1, s2) {
+                    (b'0', b'0') => 0,
+                    (b'0', b'1') => 1,
+                    (b'1', b'0') => inf,
+                    (b'1', b'1') => 0,
+                    _ => inf,
+                };
+            }
+
+            let mut cost = 0;
+            if s1 == b'0' {
+                cost += 1;
+            }
+
+            cost += (cnt - 1) as i32;
+
+            if s2 == b'1' {
+                cost += 1
+            }
+
+            cost
+        }
+
+        let s1 = s1.as_bytes();
+        let s2 = s2.as_bytes();
+        let n = s1.len();
+        let inf = 1_000_000_000;
+        let mut dp = vec![vec![inf; 2]; n + 1];
+        dp[0][0] = 0;
+
+        for i in 0..n {
+            for used_prev in 0..=1 {
+                if dp[i][used_prev] >= inf {
+                    continue;
+                }
+
+                for use_cur in 0..=1 {
+                    if i + 1 == n && use_cur == 1 {
+                        continue;
+                    }
+
+                    let cnt = used_prev + use_cur;
+                    let cost = one_pos_cost(s1[i], s2[i], cnt);
+
+                    if cost >= inf {
+                        continue;
+                    }
+
+                    let total = dp[i][used_prev] + cost + use_cur as i32;
+                    dp[i + 1][use_cur] = dp[i + 1][use_cur].min(total);
+                }
+            }
+        }
+
+        if dp[n][0] >= inf {
+            -1
+        } else {
+            dp[n][0]
+        }
+    }
+}
+
+impl Solution {
+    pub fn get_sum(nums: Vec<i32>) -> i64 {
+        const MOD1: i64 = 1_000_000_007;
+        const MOD2: i64 = 1_000_000_009;
+        const BASE: i64 = 911_382_323;
+
+        fn build_hash(nums: &[i32], modu: i64) -> Vec<i64> {
+            let mut h = vec![0i64; nums.len() + 1];
+            for i in 0..nums.len() {
+                let val = nums[i] as i64 % modu;
+                h[i + 1] = (h[i] * BASE + val) % modu;
+            }
+            h
+        }
+
+        fn build_pow(n: usize, modu: i64) -> Vec<i64> {
+            let mut p = vec![1i64; n + 1];
+            for i in 0..n {
+                p[i + 1] = p[i] * BASE % modu;
+            }
+            p
+        }
+
+        fn get_hash(h: &[i64], p: &[i64], l: usize, r: usize, modu: i64) -> i64 {
+            let len = r - l + 1;
+            (h[r + 1] - h[l] * p[len] % modu + modu) % modu
+        }
+
+        let n = nums.len();
+        let mut prefix = vec![0i64; n + 1];
+        for i in 0..n {
+            prefix[i + 1] = prefix[i] + nums[i] as i64;
+        }
+
+        let range_sum = |l: usize, r: usize| -> i64 { prefix[r + 1] - prefix[l] };
+
+        let rev: Vec<i32> = nums.iter().rev().copied().collect();
+
+        let h1 = build_hash(&nums, MOD1);
+        let h2 = build_hash(&nums, MOD2);
+        let r1 = build_hash(&rev, MOD1);
+        let r2 = build_hash(&rev, MOD2);
+
+        let p1 = build_pow(n, MOD1);
+        let p2 = build_pow(n, MOD2);
+
+        let is_pal = |l: usize, r: usize| -> bool {
+            let rl = n - 1 - r;
+            let rr = n - 1 - l;
+            get_hash(&h1, &p1, l, r, MOD1) == get_hash(&r1, &p1, rl, rr, MOD1)
+                && get_hash(&h2, &p2, l, r, MOD2) == get_hash(&r2, &p2, rl, rr, MOD2)
+        };
+
+        let mut res = 0i64;
+
+        for i in 0..n {
+            // even
+            let mut lo = 1usize;
+            let mut hi = (i + 1).min(n - i);
+            let mut best = 1usize;
+
+            while lo <= hi {
+                let mid = lo + ((hi - lo) >> 1);
+                let l = i - mid + 1;
+                let r = i + mid - 1;
+
+                if is_pal(l, r) {
+                    best = mid;
+                    lo = mid + 1;
+                } else {
+                    hi = mid - 1;
+                }
+            }
+
+            let l = i - best + 1;
+            let r = i + best - 1;
+            res = res.max(range_sum(l, r));
+        }
+
+        for i in 1..n {
+            // odd
+            let mut lo = 1usize;
+            let mut hi = i.min(n - i);
+            let mut best = 0usize;
+
+            while lo <= hi {
+                let mid = lo + ((hi - lo) >> 1);
+                let l = i - mid;
+                let r = i + mid - 1;
+
+                if is_pal(l, r) {
+                    best = mid;
+                    lo = mid + 1;
+                } else {
+                    hi = mid - 1;
+                }
+            }
+
+            if best > 0 {
+                let l = i - best;
+                let r = i + best - 1;
+                res = res.max(range_sum(l, r));
+            }
+        }
+
+        res
+    }
+}
