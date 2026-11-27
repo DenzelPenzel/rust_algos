@@ -1,5 +1,5 @@
 [workspace]
-members = ["algo_lib", "patterns/worker"]
+members = ["algo_lib", "patterns/pipe", "patterns/pipe_tokio", "patterns/worker", "tasks/chat_server", "tasks/practice", "tasks/spinlock", "tasks/vector"]
 
 [package]
 name = "rust_algos"

@@ -1,0 +1,463 @@
+use std::{future::Future, sync::Arc};
+
+use tokio::{
+    sync::{Mutex, mpsc, oneshot},
+    task::JoinSet,
+};
+
+pub const MAX_ITEMS: usize = 9_999;
+pub type Cookie = i64;
+
+pub trait Source: Send + 'static {
+    type Item: Send + Sync + 'static;
+    type Error: Send + 'static;
+
+    fn next(
+        &mut self,
+    ) -> impl Future<Output = Result<(Vec<Self::Item>, Cookie), Self::Error>> + Send;
+}
+
+pub trait Committer: Send + 'static {
+    type Error: Send + 'static;
+
+    fn commit(&mut self, cookie: Cookie) -> impl Future<Output = Result<(), Self::Error>> + Send;
+}
+
+pub trait Consumer: Send + 'static {
+    type Item: Send + Sync + 'static;
+    type Error: Send + 'static;
+
+    fn process(
+        &mut self,
+        items: &[Self::Item],
+    ) -> impl Future<Output = Result<(), Self::Error>> + Send;
+}
+
+#[derive(Debug, Clone, Copy)]
+pub struct PipeConfig {
+    pub queue_capacity: usize,
+}
+
+impl Default for PipeConfig {
+    fn default() -> Self {
+        Self { queue_capacity: 8 }
+    }
+}
+
+#[derive(Debug, PartialEq)]
+pub enum PipeError<SourceError, ConsumerError, CommitError> {
+    Source(SourceError),
+
+    Consumer { sequence: u64, error: ConsumerError },
+
+    Commit(CommitError),
+
+    SourceBatchTooLarge { actual: usize, max: usize },
+
+    NoConsumers,
+    InvalidQueueCapacity,
+    PipelineStopped,
+    TaskPanicked,
+}
+
+struct Job<T> {
+    sequence: u64,
+    items: Vec<T>,
+    cookies: Vec<Cookie>,
+    completed: oneshot::Sender<Vec<Cookie>>,
+}
+
+type Ticket = oneshot::Receiver<Vec<Cookie>>;
+
+enum PipelineFailure<SourceError, ConsumerError> {
+    Source(SourceError),
+    Consumer { sequence: u64, error: ConsumerError },
+    SourceBatchTooLarge(usize),
+    PipelineStopped,
+}
+
+async fn send_job<T>(
+    jobs: &mpsc::Sender<Job<T>>,
+    ordered: &mpsc::Sender<Option<Ticket>>,
+    sequence: &mut u64,
+    items: &mut Vec<T>,
+    cookies: &mut Vec<Cookie>,
+) -> Result<(), ()> {
+    let (completed_tx, completed_rx) = oneshot::channel();
+
+    let job = Job {
+        sequence: *sequence,
+        items: std::mem::replace(items, Vec::with_capacity(MAX_ITEMS)),
+        cookies: std::mem::take(cookies),
+        completed: completed_tx,
+    };
+
+    jobs.send(job).await.map_err(|_| ())?;
+    ordered.send(Some(completed_rx)).await.map_err(|_| ())?;
+
+    *sequence += 1;
+
+    Ok(())
+}
+
+async fn run_batcher<S, ConsumerError>(
+    mut source: S,
+    jobs: mpsc::Sender<Job<S::Item>>,
+    ordered: mpsc::Sender<Option<Ticket>>,
+) -> Result<(), PipelineFailure<S::Error, ConsumerError>>
+where
+    S: Source,
+    ConsumerError: Send + 'static,
+{
+    let mut sequence = 0;
+    let mut items = Vec::with_capacity(MAX_ITEMS);
+    let mut cookies = Vec::new();
+
+    loop {
+        let (mut next_items, cookie) = source.next().await.map_err(PipelineFailure::Source)?;
+
+        if next_items.len() > MAX_ITEMS {
+            return Err(PipelineFailure::SourceBatchTooLarge(next_items.len()));
+        }
+
+        let end_of_stream = next_items.is_empty();
+
+        let next_batch_does_not_fit =
+            !items.is_empty() && items.len() + next_items.len() > MAX_ITEMS;
+
+        if next_batch_does_not_fit {
+            send_job(&jobs, &ordered, &mut sequence, &mut items, &mut cookies)
+                .await
+                .map_err(|_| PipelineFailure::PipelineStopped)?;
+        }
+
+        items.append(&mut next_items);
+        cookies.push(cookie);
+
+        let should_flush = items.len() == MAX_ITEMS || end_of_stream;
+
+        if should_flush {
+            send_job(&jobs, &ordered, &mut sequence, &mut items, &mut cookies)
+                .await
+                .map_err(|_| PipelineFailure::PipelineStopped)?;
+        }
+
+        if end_of_stream {
+            ordered
+                .send(None)
+                .await
+                .map_err(|_| PipelineFailure::PipelineStopped)?;
+            return Ok(());
+        }
+    }
+}
+
+async fn run_worker<C, SourceError>(
+    mut consumer: C,
+    jobs: Arc<Mutex<mpsc::Receiver<Job<C::Item>>>>,
+) -> Result<(), PipelineFailure<SourceError, C::Error>>
+where
+    C: Consumer,
+    SourceError: Send + 'static,
+{
+    loop {
+        let job = {
+            let mut jobs = jobs.lock().await;
+            jobs.recv().await
+        };
+
+        let Some(job) = job else {
+            return Ok(());
+        };
+
+        if !job.items.is_empty() {
+            consumer
+                .process(&job.items)
+                .await
+                .map_err(|error| PipelineFailure::Consumer {
+                    sequence: job.sequence,
+                    error,
+                })?;
+        }
+
+        job.completed
+            .send(job.cookies)
+            .map_err(|_| PipelineFailure::PipelineStopped)?;
+    }
+}
+
+fn spawn_report<E>(
+    tasks: &mut JoinSet<()>,
+    failures: mpsc::UnboundedSender<E>,
+    task: impl Future<Output = Result<(), E>> + Send + 'static,
+) where
+    E: Send + 'static,
+{
+    tasks.spawn(async move {
+        if let Err(error) = task.await {
+            let _ = failures.send(error);
+        }
+    });
+}
+
+fn into_pipe_error<SourceError, ConsumerError, CommitError>(
+    failure: PipelineFailure<SourceError, ConsumerError>,
+) -> PipeError<SourceError, ConsumerError, CommitError> {
+    match failure {
+        PipelineFailure::Source(error) => PipeError::Source(error),
+        PipelineFailure::Consumer { sequence, error } => PipeError::Consumer { sequence, error },
+        PipelineFailure::SourceBatchTooLarge(actual) => PipeError::SourceBatchTooLarge {
+            actual,
+            max: MAX_ITEMS,
+        },
+        PipelineFailure::PipelineStopped => PipeError::PipelineStopped,
+    }
+}
+
+async fn wait_or_fail<F, SourceError, ConsumerError, CommitError>(
+    future: F,
+    failures: &mut mpsc::UnboundedReceiver<PipelineFailure<SourceError, ConsumerError>>,
+    tasks: &mut JoinSet<()>,
+) -> Result<F::Output, PipeError<SourceError, ConsumerError, CommitError>>
+where
+    F: Future,
+{
+    tokio::pin!(future);
+    let mut failures_open = true;
+
+    loop {
+        tokio::select! {
+            biased;
+
+            failure = failures.recv(), if failures_open => {
+                match failure {
+                    Some(failure) => return Err(into_pipe_error(failure)),
+                    None => failures_open = false,
+                }
+            }
+
+            task = tasks.join_next(), if !tasks.is_empty() => {
+                if matches!(task, Some(Err(_))) {
+                    return Err(PipeError::TaskPanicked);
+                }
+            }
+
+            result = &mut future => return Ok(result),
+        }
+    }
+}
+
+pub async fn pipe_parallel<S, K, C>(
+    source: S,
+    mut committer: K,
+    consumers: Vec<C>,
+    config: PipeConfig,
+) -> Result<(), PipeError<S::Error, C::Error, K::Error>>
+where
+    S: Source,
+    K: Committer,
+    C: Consumer<Item = S::Item>,
+{
+    if consumers.is_empty() {
+        return Err(PipeError::NoConsumers);
+    }
+
+    if config.queue_capacity == 0 {
+        return Err(PipeError::InvalidQueueCapacity);
+    }
+
+    let (jobs_tx, jobs_rx) = mpsc::channel(config.queue_capacity);
+    let jobs_rx = Arc::new(Mutex::new(jobs_rx));
+    let (ordered_tx, mut ordered_rx) = mpsc::channel(config.queue_capacity);
+    let (failures_tx, mut failures_rx) = mpsc::unbounded_channel();
+
+    let mut tasks = JoinSet::new();
+
+    spawn_report(
+        &mut tasks,
+        failures_tx.clone(),
+        run_batcher::<S, C::Error>(source, jobs_tx, ordered_tx),
+    );
+
+    for consumer in consumers {
+        spawn_report(
+            &mut tasks,
+            failures_tx.clone(),
+            run_worker::<C, S::Error>(consumer, Arc::clone(&jobs_rx)),
+        );
+    }
+
+    drop(jobs_rx);
+    drop(failures_tx);
+
+    let mut pipeline_result = async {
+        loop {
+            let Some(ticket) = wait_or_fail::<_, S::Error, C::Error, K::Error>(
+                ordered_rx.recv(),
+                &mut failures_rx,
+                &mut tasks,
+            )
+            .await?
+            .ok_or(PipeError::PipelineStopped)?
+            else {
+                return Ok(());
+            };
+
+            let cookies = wait_or_fail::<_, S::Error, C::Error, K::Error>(
+                ticket,
+                &mut failures_rx,
+                &mut tasks,
+            )
+            .await?
+            .map_err(|_| PipeError::PipelineStopped)?;
+
+            for cookie in cookies {
+                committer.commit(cookie).await.map_err(PipeError::Commit)?;
+            }
+        }
+    }
+    .await;
+
+    if pipeline_result.is_err() {
+        tasks.abort_all();
+    }
+
+    while let Some(task_result) = tasks.join_next().await {
+        if task_result.is_err() && pipeline_result.is_ok() {
+            pipeline_result = Err(PipeError::TaskPanicked);
+        }
+    }
+
+    pipeline_result
+}
+
+#[tokio::main]
+async fn main() {
+    println!("Hello, world!");
+}
+
+#[cfg(test)]
+mod tests {
+    use std::{
+        collections::VecDeque,
+        sync::{Arc, Mutex as StdMutex},
+        time::Duration,
+    };
+
+    use tokio::{sync::Notify, time::timeout};
+
+    use super::*;
+
+    struct TestSource {
+        batches: VecDeque<(Vec<u32>, Cookie)>,
+    }
+
+    impl Source for TestSource {
+        type Item = u32;
+        type Error = &'static str;
+
+        async fn next(&mut self) -> Result<(Vec<Self::Item>, Cookie), Self::Error> {
+            self.batches.pop_front().ok_or("source exhausted")
+        }
+    }
+
+    struct TestCommitter {
+        commits: Arc<StdMutex<Vec<Cookie>>>,
+    }
+
+    impl Committer for TestCommitter {
+        type Error = &'static str;
+
+        async fn commit(&mut self, cookie: Cookie) -> Result<(), Self::Error> {
+            self.commits
+                .lock()
+                .map_err(|_| "commits mutex poisoned")?
+                .push(cookie);
+            Ok(())
+        }
+    }
+
+    struct TestConsumer {
+        release_first: Arc<Notify>,
+        fail_second: bool,
+    }
+
+    impl Consumer for TestConsumer {
+        type Item = u32;
+        type Error = &'static str;
+
+        async fn process(&mut self, items: &[Self::Item]) -> Result<(), Self::Error> {
+            match items[0] {
+                1 => self.release_first.notified().await,
+                2 if self.fail_second => return Err("second batch failed"),
+                2 => self.release_first.notify_one(),
+                _ => {}
+            }
+
+            Ok(())
+        }
+    }
+
+    fn source() -> TestSource {
+        TestSource {
+            batches: VecDeque::from([(vec![1; 6_000], 1), (vec![2; 6_000], 2), (Vec::new(), 3)]),
+        }
+    }
+
+    fn consumers(release_first: &Arc<Notify>, fail_second: bool) -> Vec<TestConsumer> {
+        (0..2)
+            .map(|_| TestConsumer {
+                release_first: Arc::clone(release_first),
+                fail_second,
+            })
+            .collect()
+    }
+
+    #[tokio::test(flavor = "multi_thread", worker_threads = 4)]
+    async fn commits_in_source_order_when_workers_finish_out_of_order() {
+        let commits = Arc::new(StdMutex::new(Vec::new()));
+        let release_first = Arc::new(Notify::new());
+
+        let result = pipe_parallel(
+            source(),
+            TestCommitter {
+                commits: Arc::clone(&commits),
+            },
+            consumers(&release_first, false),
+            PipeConfig { queue_capacity: 2 },
+        )
+        .await;
+
+        assert_eq!(result, Ok(()));
+        assert_eq!(*commits.lock().expect("commits mutex poisoned"), [1, 2, 3]);
+    }
+
+    #[tokio::test(flavor = "multi_thread", worker_threads = 4)]
+    async fn returns_later_worker_error_without_waiting_for_earlier_batch() {
+        let commits = Arc::new(StdMutex::new(Vec::new()));
+        let release_first = Arc::new(Notify::new());
+
+        let result = timeout(
+            Duration::from_secs(1),
+            pipe_parallel(
+                source(),
+                TestCommitter {
+                    commits: Arc::clone(&commits),
+                },
+                consumers(&release_first, true),
+                PipeConfig { queue_capacity: 2 },
+            ),
+        )
+        .await
+        .expect("pipe did not return the worker error immediately");
+
+        assert_eq!(
+            result,
+            Err(PipeError::Consumer {
+                sequence: 1,
+                error: "second batch failed",
+            })
+        );
+        assert!(commits.lock().expect("commits mutex poisoned").is_empty());
+    }
+}
